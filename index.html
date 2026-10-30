@@ -8,6 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hugo">
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:image" content="https://pathassey-code.github.io/hugo/icon-512.png">
 <meta property="og:title" content="Hugo's Adventures in Wonderland">
 <meta property="og:description" content="Run, jump and beat the bosses across six worlds! Turn your phone sideways to play.">
 <meta property="og:type" content="website">
@@ -3437,8 +3441,25 @@ function overlay(alpha) {
   ctx.fillRect(0, 0, W, H);
 }
 
+// iPhones can only play full screen from a Home Screen icon, so suggest adding one
+const IS_IPHONE = /iPhone|iPod/.test(navigator.userAgent);
+const IS_HOME_APP = navigator.standalone === true || matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+const SHOW_HOME_TIP = IS_IPHONE && !IS_HOME_APP;
+
+function drawShareIcon(x, y) {
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(x - 4, y - 4); ctx.lineTo(x - 8, y - 4); ctx.lineTo(x - 8, y + 9); ctx.lineTo(x + 8, y + 9); ctx.lineTo(x + 8, y - 4); ctx.lineTo(x + 4, y - 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y + 3); ctx.lineTo(x, y - 11); ctx.moveTo(x - 4, y - 7); ctx.lineTo(x, y - 11); ctx.lineTo(x + 4, y - 7); ctx.stroke();
+}
+
 function drawTitle() {
   overlay(0.35);
+  if (SHOW_HOME_TIP) {
+    ctx.fillStyle = 'rgba(10, 25, 40, 0.75)';
+    rr(W / 2 - 300, 8, 600, 34, 17); ctx.fill();
+    drawShareIcon(W / 2 - 272, 25);
+    text('For full screen: tap Share, then "Add to Home Screen"', W / 2 + 14, 25, 16, '#ffd166', 'center', 'bold', false);
+  }
   text("HUGO'S ADVENTURES", W / 2, 92, 62, '#ffd166');
   text('in Wonderland', W / 2, 146, 34, '#9bf6ff');
   text('Beat the bosses and find the six Wonder Stars!', W / 2, 186, 18, '#fff', 'center', 'normal');
