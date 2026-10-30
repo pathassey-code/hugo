@@ -857,13 +857,29 @@ function startGame() {
   playMusic(def.theme);
 }
 
-// Continue: replay the world Hugo reached with a full set of lives, keeping the score
+// Continue: a full set of lives, keeping the score, starting from the boss fight if Hugo
+// reached it, otherwise from the last checkpoint he touched
 function continueGame() {
   continues++;
   lives = START_LIVES;
+  const atBoss = arena.active;
+  const cpIndex = level.checkpoints.map(c => c.active).lastIndexOf(true);
   loadLevel(levelIndex);
   state = 'playing';
   playMusic(def.theme);
+  if (atBoss) {
+    bannerT = 0;
+    cam.x = LEVEL_W - W;
+    startBoss();
+    player = makePlayer(respawn.x, respawn.y);
+    player.weapon = true;
+  } else if (cpIndex >= 0) {
+    const cp = level.checkpoints[cpIndex];
+    cp.active = true;
+    respawn = { x: cp.x, y: cp.y + cp.h - 44 };
+    player = makePlayer(respawn.x, respawn.y);
+    cam.x = clamp(player.x - W * 0.4, 0, LEVEL_W - W);
+  }
 }
 
 // ===========================================================================
@@ -1011,6 +1027,7 @@ function loseLife() {
   }
   const p = makePlayer(respawn.x, respawn.y);
   p.invuln = 2;
+  if (arena.active) p.weapon = true;   // never face a boss without the boomerang
   player = p;
   cam.x = clamp(p.x - W * 0.4, 0, LEVEL_W - W);
   if (boss && !boss.defeated) {
@@ -1314,6 +1331,12 @@ function startBoss() {
   level.spikes = level.spikes.filter(s => s.x < arena.left - 60);
   playMusic('boss');
   sfx.boss();
+  if (!player.weapon) {
+    // a boss fight always comes with a boomerang
+    player.weapon = true;
+    popup(player.x + player.w / 2, player.y - 20, 'BOOMERANG!', '#ffd166');
+    burst(player.x + player.w / 2, player.y + 10, 16, { colors: ['#ffd166', '#ffffff'], speed: 200, size: 3, kind: 'spark', grav: 100 });
+  }
 }
 
 function hitBoss() {
