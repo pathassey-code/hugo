@@ -1,7 +1,7 @@
 {
   "name": "Hugo's Adventures in Wonderland",
   "short_name": "Hugo",
-  "description": "Run, jump and beat the bosses across six worlds!",
+  "description": "Run, jump and beat the bosses across ten worlds - then rocket to the Moon!",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
